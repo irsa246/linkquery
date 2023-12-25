@@ -1,0 +1,52 @@
+﻿@page "/enroll"
+@using linkquery.Data;
+
+@inject WebDbContext _db
+
+<EditForm Model="@enrol" OnValidSubmit="@HandleSubmit">
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+    <label>Student ID</label>
+    <input type="text" @bind-value="enrol.S_id" class="form-control" />
+    <br />
+    <label>Class ID</label>
+    <input type="text" @bind-value="enrol.C_id" class="form-control"/>
+  
+    <input type="submit" name="Submit" />
+</EditForm>
+
+<table>
+    <tbody>
+        <tr>
+            <th>Enrollment Id</th>
+            <th>Student Id</th>
+            <th>Class Id</th>
+        </tr>
+        @foreach (var e in enrollments)
+        {
+            <tr>
+                <td>@e.id</td>
+                <td>@e.S_id</td>
+                <td>@e.C_id</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+    Enrolled enrol = new Enrolled();
+
+    List<Enrolled> enrollments = new List<Enrolled>();
+
+    protected override void OnInitialized()
+    {
+        enrollments = _db.Enrolled.ToList();
+    }
+
+    void HandleSubmit()
+    {
+        _db.Add(enrol);
+        _db.SaveChangesAsync();
+    }
+}

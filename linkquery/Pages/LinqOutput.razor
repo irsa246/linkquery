@@ -1,0 +1,76 @@
+﻿@page "/final"
+@using linkquery.Data;
+@inject WebDbContext _db
+
+<h3>Results</h3>
+
+
+@if (ClassesWithMore != null && ClassesWithMore.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Class Name</th>
+                <th>Room Number</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var info in ClassesWithMore)
+            {
+                <tr>
+                    <td>@info.C_name</td>
+                    <td>@info.Romm_num</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No classes with more than 100 students found.</p>
+}
+
+
+
+<h3>Students with No Classes in Department 22</h3>
+
+@if (studentsWithNoClasses != null && studentsWithNoClasses.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Student ID</th>
+                <th>Major</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var studentInfo in studentsWithNoClasses)
+            {
+                <tr>
+                    <td>@studentInfo.S_id</td>
+                    <td>@studentInfo.Major</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No students found who take no classes with teachers in department 22.</p>
+}
+
+@code {
+    List<Class> ClassesWithMore = new List<Class>();
+    List<Student> studentsWithNoClasses = new List<Student>();
+
+    protected override void OnInitialized()
+    {
+        // Call a method to retrieve class information with more than 100 students
+        ClassesWithMore = _db.Classes.Where(c => _db.Enrolled.Count(x => x.C_id == c.C_id) > 100).ToList();
+        studentsWithNoClasses = _db.Students.Where(s => !_db.Enrolled
+                .Join(_db.Classes, e => e.C_id, c => c.C_id, (e, c) => new { e, c })
+                .Join(_db.Faculty, ec => ec.c.f_id, f => f.f_id, (ec, f) => new { ec, f })
+                .Any(joined => joined.f.dept_id == 22 && joined.ec.e.S_id == s.S_id)).ToList();
+    }
+
+}

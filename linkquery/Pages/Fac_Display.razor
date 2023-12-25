@@ -1,0 +1,61 @@
+﻿@page "/faculty"
+@using linkquery.Data;
+
+@inject WebDbContext _db
+
+<PageTitle>Faculty</PageTitle>
+
+
+<EditForm Model="@fac" OnValidSubmit="@HandleSubmit">
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+    <label>Faculty Name</label>
+    <input type="text" @bind-value="fac.f_name" class="form-control" />
+    <br />
+    <label>Your Department ID</label>
+    <input type="text" @bind-value="fac.dept_id" class="form-control"/>
+    <br />
+    <label>Your Standing</label>
+    <input type="text" @bind-value="fac.f_standing" class="form-control"/>
+    <br />
+
+    <input type="submit" name="Submit" />
+</EditForm>
+
+<table>
+    <tbody>
+        <tr>
+            <th>Faculty Id</th>
+            <th>Faculty Name</th>
+            <th>DeptId</th>
+            <th>Standing</th>
+        </tr>
+        @foreach (var f in faculty)
+        {
+            <tr>
+                <td>@f.f_id</td>
+                <td>@f.f_name</td>
+                <td>@f.dept_id</td>
+                <td>@f.f_standing</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+    Faculty fac = new Faculty();
+
+    List<Faculty> faculty = new List<Faculty>();
+
+    protected override void OnInitialized()
+    {
+        faculty = _db.Faculty.ToList();
+    }
+
+    void HandleSubmit()
+    {
+        _db.Add(fac);
+        _db.SaveChangesAsync();
+    }
+}

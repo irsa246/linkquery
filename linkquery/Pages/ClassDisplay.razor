@@ -1,0 +1,60 @@
+﻿@page "/class"
+@using linkquery.Data;
+
+@inject WebDbContext _db
+
+<PageTitle>Class</PageTitle>
+
+
+<EditForm Model="@cl" OnValidSubmit="@HandleSubmit">
+   <DataAnnotationsValidator/>
+   <ValidationSummary/>
+   <label>Class Name</label>
+   <input type="text" @bind-value="cl.C_name" class="form-control" />
+    <br />
+    <label>Enter Room Number</label>
+    <input type="number" @bind-value="cl.Romm_num" class="form-control" />
+    <br />
+    <label for="facultyid">Faculty Id:</label>
+    <InputNumber id="facultyid" @bind-Value="cl.f_id" class="form-control" />
+    <br />
+    <input type="submit" name="Submit" />
+</EditForm>
+
+<table>
+    <tbody>
+        <tr>
+            <th>Class Id</th>
+            <th>Class Name</th>
+            <th>Room number</th>
+            <th>Faculty Id</th>
+        </tr>
+        @foreach (var c in classes)
+        {
+            <tr>
+                <td>@c.C_id</td>
+                <td>@c.C_name</td>
+                <td>@c.Romm_num</td>
+                <td>@c.f_id</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+    Class cl = new Class();
+
+    List<Class> classes = new List<Class>();
+
+    protected override void OnInitialized()
+    {
+        classes = _db.Classes.ToList();
+    }
+
+    void HandleSubmit()
+    {
+        _db.Add(cl);
+        _db.SaveChangesAsync();
+    }
+}

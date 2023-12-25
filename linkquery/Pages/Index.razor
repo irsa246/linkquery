@@ -1,0 +1,141 @@
+﻿@page "/"
+@using linkquery.Data;
+@inject WebDbContext _db
+
+<PageTitle>Index</PageTitle>
+<style>
+    table{
+        margin-top:10%;
+        width:70%;
+        border:1px solid;
+        margin-left: 6%;
+    }
+    th{
+        height:70%;
+        border: 1px solid;
+        text-align:center;
+        background-color:#ddd;
+        color: black;
+        padding:10px;
+        font-style:italic;
+        font-family:'Adobe Arabic';
+        font-size:26px;
+        font-weight:bold;
+
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+    td{
+        border:1px solid;
+        text-align: center;
+        padding:7px;
+        font-style: italic;
+        font-size: 20px;
+        font-family: 'Adobe Arabic';
+    }
+    .form{
+        margin-top:5%;
+        width:50%;
+        margin-left:20%;
+        align-content:center;
+       
+    }
+    label{
+        font-style: italic;
+        font-size: 25px;
+        font-family: 'Adobe Arabic';
+    }
+    input[type="text"]{
+        padding: 12px 20px;
+        width:70%;
+        margin: 8px 0;
+        box-sizing: border-box;
+    }
+
+    input[type="number"] {
+        padding: 12px 20px;
+        width: 70%;
+        margin: 8px 0;
+        box-sizing: border-box;
+    }
+
+    input[type="submit"] {
+        padding: 12px 20px;
+        width: 70%;
+        margin: 8px 0;
+        box-sizing: border-box;
+        border-radius:15px;
+        font-family: 'Adobe Arabic';
+        font-style:italic;
+        font-size:25px;
+        font-weight:bold;
+        
+    }
+    h2{
+        font-family: 'Adobe Arabic';
+        font-style: italic;
+        font-size: 40px;
+        font-weight: bold;
+        margin-left: 27%;
+        margin-top:5%;
+    }
+</style>
+<h2>"Student Data"</h2>
+<div class="form">
+<EditForm Model="@Std" OnValidSubmit="@HandleSubmit">
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+    <label>Student Name</label>
+    <input type="text" @bind="@Std.S_name" class="form-control"/>
+    <br />
+    <label>Select Major</label>
+    <input type="text" @bind="@Std.Major" class="form-control" />
+    <br />
+    <label>Your Standing </label>
+    <input type="number" @bind="@Std.Standing" class="form-control"/>
+    <br />
+    <input type="submit" value="Submit" />
+
+   
+</EditForm>
+</div>
+<table >
+    <tbody>
+        <tr>
+            <th>Student Id</th>
+            <th>Student Name</th>
+            <th>Major</th>
+            <th>Standing</th>
+        </tr>
+        @foreach (var s in students)
+        {
+            <tr>
+                <td>@s.S_id</td>
+                <td>@s.S_name</td>
+                <td>@s.Major</td>
+                <td>@s.Standing</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+    Student Std = new Student();
+
+    List<Student> students = new List<Student>();
+
+    protected override void OnInitialized()
+    {
+        students = _db.Students.ToList();
+    }
+
+    void HandleSubmit()
+    {
+        _db.Add(Std);
+        _db.SaveChangesAsync();
+    }
+}
+
